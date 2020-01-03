@@ -1,37 +1,40 @@
 # Standard library imports
-import importlib, inspect, os, pkgutil, sys
+import sys
+from typing import List, Dict
 
 # Local application imports
-from core.providers.base import BaseProvider
+from core.providers.base import BaseProvider, ParameterMetadata
 
 # Load all provider implementation modules
 from core.providers.impl import *
 
+
 class ProvidersManager:
     """
     Description
-    --    
+    --
     - Lists available providers.
     - Creates an instance of a provider.
     """
 
     # Initialized once, at loading and then cached
-    _providers = {}
+    _providers = {}     # Dict[str, BaseProvider]
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Description
         --
         Initializes the instance.
         - Loads and caches the list of providers.
         """
-        # Find all classes that inherit from the base (works because the implementation modules are imported)
+        # Find all classes that inherit from the base (works because the
+        # implementation modules are imported)
         providers = BaseProvider.__subclasses__()
         for provider in providers:
             # Dictionary of provider_id:provider_module
             self._providers[provider.__name__] = provider.__module__
 
-    def get_all_ids(self):
+    def get_all_ids(self) -> List[str]:
         """
         Description
         --
@@ -44,7 +47,9 @@ class ProvidersManager:
 
         return list(self._providers.keys())
 
-    def discover_provider_parameters(self, provider_id):
+    def discover_parameters(self, provider_id: str) -> Dict[
+                                                        str,
+                                                        ParameterMetadata]:
         """
         Description
         --
@@ -52,7 +57,8 @@ class ProvidersManager:
 
         Parameters
         --
-        - provider_id - the Id of the provider of which we want to discover the runtime parameters.
+        - provider_id - the Id of the provider of which we want to discover
+        the runtime parameters.
 
         Returns
         --
@@ -65,7 +71,7 @@ class ProvidersManager:
         # Ask the instance of the provider to reveal its runtime parameters.
         return provider_instance.discover_parameters()
 
-    def instantiate(self, provider_id):
+    def instantiate(self, provider_id: str) -> BaseProvider:
         """
         Description
         --
@@ -73,18 +79,22 @@ class ProvidersManager:
 
         Parameters
         --
-        - provider_id - the Id of the provider which we want to create an instance of.
+        - provider_id - the Id of the provider which we want to create an
+        instance of.
 
         Returns
         --
         An instance of the provider.
         """
 
-        if not provider_id or provider_id == "":
+        if not provider_id:
             raise ValueError("provider_id is required!")
 
         # Use 'reflection' to create an instance
-        provider_class_ = getattr(sys.modules[self._providers[provider_id]], provider_id)
+        provider_class_ = getattr(
+                            sys.modules[self._providers[provider_id]],
+                            provider_id)
+
         instance = provider_class_()
 
         # Return the instance
