@@ -1,6 +1,7 @@
 # Local application imports
 from core.providers.base import BaseProvider, ParameterMetadata
 
+
 class FakeProvider(BaseProvider):
     """
     Description
@@ -9,12 +10,12 @@ class FakeProvider(BaseProvider):
     - For testing purposes
     """
 
-    isRan = False
+    def __init__(self):
+        self.isRan = False
 
     def _run(self, parameters):
         self.isRan = True
-
-        return { "IsRan": True, "Parameters": parameters }
+        return {"IsRan": True, "Parameters": parameters}
 
     def _validate(self, parameters):
         if (not parameters["FakeParam1"]):

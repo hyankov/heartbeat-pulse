@@ -3,6 +3,7 @@ import unittest
 # Local application imports
 from core.providers.impl.fake import FakeProvider
 
+
 class TestFakeProvider(unittest.TestCase):
     def test_run_valid_params(self):
         # Arrange
@@ -29,7 +30,7 @@ class TestFakeProvider(unittest.TestCase):
         # Act & Assert
         with self.assertRaises(ValueError):
             provider.run(parameters)
-        
+
         self.assertFalse(provider.isRan)
 
     def test_validate_validparams(self):
@@ -61,7 +62,7 @@ class TestFakeProvider(unittest.TestCase):
         # Arrange
         provider = FakeProvider()
 
-         # Act
+        # Act
         discovered_params = provider.discover_parameters()
 
         # Assert

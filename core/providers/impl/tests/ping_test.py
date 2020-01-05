@@ -3,6 +3,7 @@ import unittest
 # Local application imports
 from core.providers.impl.ping import PingProvider
 
+
 class TestPingProvider(unittest.TestCase):
     def test_run_valid_params(self):
         # Arrange
@@ -12,10 +13,10 @@ class TestPingProvider(unittest.TestCase):
         provider = PingProvider()
 
         # Act
-        provider.run(parameters)
+        provider_run = provider.run(parameters)
 
         # Assert
-        self.assertTrue(True)
+        self.assertIsInstance(provider_run.result, float)
 
     def test_run_invalid_params(self):
         # Arrange
@@ -54,7 +55,7 @@ class TestPingProvider(unittest.TestCase):
         # Arrange
         ping_provider = PingProvider()
 
-         # Act
+        # Act
         discovered_params = ping_provider.discover_parameters()
 
         # Assert

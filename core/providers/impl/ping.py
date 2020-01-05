@@ -3,6 +3,8 @@ from ping3 import ping
 
 # Local application imports
 from core.providers.base import BaseProvider, ParameterMetadata
+import time
+
 
 class PingProvider(BaseProvider):
     """
@@ -18,21 +20,22 @@ class PingProvider(BaseProvider):
 
     _unit = "ms"
     _count = 5
-    _parameter_target = "Target"
+    _p_target = "Target"
 
     def _run(self, parameters):
-        target = parameters[self._parameter_target]
-        return ping(target, unit = self._unit)
+        target = parameters[self._p_target]
+        #time.sleep(5)
+        return ping(target, unit=self._unit)
 
     def _validate(self, parameters):
         # Validate the target
-        if (not parameters[self._parameter_target]):
-            raise ValueError("'{param}' value is required!".format(param = self._parameter_target))
+        if (not parameters[self._p_target]):
+            raise ValueError("'{}' is required!".format(self._p_target))
 
-        #TODO: IP/hostname format validation
+        # TODO: IP/hostname format validation
 
     def _discover_parameters(self) -> dict:
         return {
             # IP / Hostname
-            self._parameter_target: ParameterMetadata("IP or hostname", True)
+            self._p_target: ParameterMetadata("IP or hostname", True)
         }

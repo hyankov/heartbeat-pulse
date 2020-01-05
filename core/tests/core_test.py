@@ -1,13 +1,14 @@
 # System imports
 import unittest
 import matplotlib.pyplot as plt
+from typing import List
 
 # Local application imports
 from core.profiles.base import Profile
 from core.profiles.management import ProfileManager
 from core.profiles.storage import InMemoryProfileStorage
 from core.providers.management import ProvidersManager
-from core.running import ProfileRunner
+from cron.running import ProfileRunner, ProfileRun
 
 
 class TestCore(unittest.TestCase):
@@ -32,19 +33,19 @@ class TestCore(unittest.TestCase):
         ping_provider_id = provider_ids[0]
 
         # Ping 1
-        profile = Profile(ping_provider_id)
+        profile = Profile("Ping localhost", ping_provider_id)
         profile.provider_parameters = {"Target": "127.0.0.1"}
         profile_runner.add(profile)
         ping1_id = profile.profile_id
 
         # Ping 2
-        profile = Profile(ping_provider_id)
+        profile = Profile("Ping Google", ping_provider_id)
         profile.provider_parameters = {"Target": "google.com"}
         profile_runner.add(profile)
         ping2_id = profile.profile_id
 
         # Fake Provider 1
-        profile = Profile("FakeProvider")
+        profile = Profile("Fake", "FakeProvider")
         profile.provider_parameters = {
                                         "FakeParam1": "param 1",
                                         "FakeParam2": "param 1"
@@ -53,9 +54,9 @@ class TestCore(unittest.TestCase):
 
         profile_runner = ProfileRunner(profile_runner, providers_manager)
 
-        results = []
+        results = []  # type: List[ProfileRun]
         for x in range(10):
-            results.extend(profile_runner.run_all_serial())
+            results.extend(profile_runner.run_all())
 
         ping1_results = filter(lambda res: res.profile_id == ping1_id, results)
         ping2_results = filter(lambda res: res.profile_id == ping2_id, results)
@@ -64,8 +65,8 @@ class TestCore(unittest.TestCase):
         plt.xlabel('Date-Time')
         plt.ylabel('Ping (ms)')
 
-        plt.plot([o.result for o in ping1_results])
-        plt.plot([o.result for o in ping2_results])
+        plt.plot([o.provider_run.result for o in ping1_results])
+        plt.plot([o.provider_run.result for o in ping2_results])
         plt.show()
 
         self.assertTrue(True)

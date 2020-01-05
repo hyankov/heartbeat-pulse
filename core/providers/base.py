@@ -1,6 +1,7 @@
 # Import system
 import abc
 from typing import Any, Dict
+from datetime import datetime
 
 
 class ParameterMetadata:
@@ -10,31 +11,39 @@ class ParameterMetadata:
     Meta description of a provider parameter.
     """
 
-    _required = False       # type: bool
-    _description = None     # type: str
-
     def __init__(self, description: str, required: bool) -> None:
         """
-        Description
-        --
-        Initializes the instance.
-
-        Parameters
-        --
         - description - the description of the parameter.
         - required - true or false, whether the parameter is required.
         """
 
-        self._description = description
-        self._required = required
+        self.description = description
+        self.required = required
+
+
+class ProviderRun:
+    """
+    A provider run.
+    """
+
+    def __init__(
+                self,
+                started_at: datetime,
+                finished_at: datetime,
+                result: Any) -> None:
+        """
+        - started_at - When was the run started.
+        - finished_at - When was the run finished.
+        - result - The result of th run.
+        """
+
+        self.started_at = started_at
+        self.finished_at = finished_at
+        self.result = result
 
     @property
-    def required(self) -> bool:
-        return self._required
-
-    @property
-    def description(self) -> str:
-        return self._description
+    def runtime_ms(self) -> int:
+        return (self.finished_at - self.started_at).microseconds / 1000
 
 
 class BaseProvider(abc.ABC):
@@ -47,7 +56,7 @@ class BaseProvider(abc.ABC):
     - Common parameters for all providers.
     """
 
-    def run(self, parameters: Dict[str, str]) -> Any:
+    def run(self, parameters: Dict[str, str]) -> ProviderRun:
         """
         Description
         --
@@ -68,10 +77,12 @@ class BaseProvider(abc.ABC):
         self.validate(parameters)
 
         # Run the implementation work-load
+        started_at = datetime.utcnow()
         result = self._run(parameters)
+        finished_at = datetime.utcnow()
 
-        # Return the provider result
-        return result
+        # Return the provider run
+        return ProviderRun(started_at, finished_at, result)
 
     def validate(self, parameters: Dict[str, str]) -> None:
         """
@@ -132,7 +143,7 @@ class BaseProvider(abc.ABC):
         The parameters, specific to the provider implementation, if any.
         """
 
-        return {}
+        return {}  # type Dict[str, ParameterMetadata]
 
     def _validate(self, parameters: Dict[str, str]) -> None:
         """

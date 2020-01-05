@@ -22,10 +22,7 @@ class ProvidersManager:
 
     def __init__(self) -> None:
         """
-        Description
-        --
-        Initializes the instance.
-        - Loads and caches the list of providers.
+        Loads and caches the list of providers.
         """
         # Find all classes that inherit from the base (works because the
         # implementation modules are imported)
@@ -65,6 +62,9 @@ class ProvidersManager:
         A dictionary of the parameters a provider would expect at runtime.
         """
 
+        if not provider_id:
+            raise ValueError("provider_id is required!")
+
         # Create an instance of the provider
         provider_instance = self.instantiate(provider_id)
 
@@ -95,7 +95,5 @@ class ProvidersManager:
                             sys.modules[self._providers[provider_id]],
                             provider_id)
 
-        instance = provider_class_()
-
         # Return the instance
-        return instance
+        return provider_class_()

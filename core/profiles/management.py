@@ -15,27 +15,14 @@ class ProfileManager:
     - CRUD profiles.
     """
 
-    _providers_manager = None   # type: ProvidersManager
-    _profile_storage = None     # type: BaseProfileStorage
-
     def __init__(
                 self,
                 providers_manager: ProvidersManager,
                 profile_storage: BaseProfileStorage) -> None:
         """
-        Initializes the instance.
-
-        Parameters
-        --
         - providers_manager - an instance of the providers manager.
         - profile_storage - an instance of profile storage implementation.
         """
-
-        if providers_manager is None:
-            raise ValueError("providers_manager is required!")
-
-        if profile_storage is None:
-            raise ValueError("profile_storage is required!")
 
         self._providers_manager = providers_manager
         self._profile_storage = profile_storage
