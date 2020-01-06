@@ -15,10 +15,8 @@ if __name__ == '__main__':
     profile_runner = ProfileRunner(
                         ProfileManager(
                             providers_manager,
-                            FileProfileStorage()),
+                            FileProfileStorage("D:\\PythonProjects\\heartbeat\\heartbeat-pulse\\profiles.dat")),
                         providers_manager)
-    results_handler = ConsoleResultHandler()
-
-    # Run
-    runner = CronRunner(profile_runner, results_handler)
+    # Start
+    runner = CronRunner(profile_runner, ConsoleResultHandler())
     runner.start()

@@ -1,11 +1,12 @@
 # Standard library imports
 import abc
+import pickle
 from typing import List, Dict
 
 # Local imports
 from core.profiles.base import Profile
-import pickle
 from os import path
+import os
 
 
 class BaseProfileStorage(abc.ABC):
@@ -227,19 +228,26 @@ class FileProfileStorage(BaseProfileStorage):
     A file-based profile storage. Serializes and deserializes data to file.
     """
 
-    _filename = "profiles.data"
+    _file_path = None    # type: str
+
+    def __init__(self, data_file: str) -> None:
+        if not data_file:
+            raise ValueError("data_file is required!")
+
+        self._file_path = data_file
 
     def _get_profiles(self) -> Dict[str, Profile]:
         profiles = {}  # type: Dict[str, Profile]
 
-        if path.exists(self._filename):
-            with open(self._filename, 'rb') as file:
-                profiles = pickle.load(file)
+        if path.exists(self._file_path):
+            if os.stat(self._file_path).st_size > 0:
+                with open(self._file_path, 'rb') as file:
+                    profiles = pickle.load(file)
 
         return profiles
 
     def _set_profiles(self, profiles: Dict[str, Profile]) -> None:
-        with open(self._filename, 'wb') as file:
+        with open(self._file_path, 'wb') as file:
             pickle.dump(profiles, file)
 
     def get_all_ids(self) -> List[str]:

@@ -19,9 +19,7 @@ class ProfileRunner:
     - Runs profiles.
     """
 
-    # We can run X number of profiles in parallel
-    max_parallel_profile_runs = 4
-    max_timeout_s = 5
+    max_profile_run_timeout_s = 5
 
     def __init__(
             self,
@@ -62,7 +60,16 @@ class ProfileRunner:
         provider_instance = self._providers_manager.instantiate(profile.provider_id)
 
         # Run the provider, by passing the profile parameters
-        return (datetime.utcnow(), provider_instance.run(profile.provider_parameters), datetime.utcnow())
+        start = datetime.utcnow()
+        result = provider_instance.run(profile.provider_parameters)
+        end = datetime.utcnow()
+
+        if (end - start).total_seconds() < self.max_profile_run_timeout_s:
+            # Completed in time
+            return (start, result, end)
+        else:
+            # "Timed out" (not really, we just waited for it too long)
+            return (start, ProviderResult(ResultStatus.TIMEOUT), end)
 
     def _run_many_parallel(self, profile_ids: List[str]) -> Generator[ProfileResult, None, None]:
         """
@@ -82,22 +89,7 @@ class ProfileRunner:
         if not profile_ids:
             return
 
-        """
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_parallel_profile_runs) as executor:
-            for profile_id, future in [(profile_id, executor.submit(self._run_one, profile_id)) for profile_id in profile_ids]:
-                profile_result = ProfileResult(profile_id, datetime.utcnow())
-                try:
-                    profile_result.result = future.result(timeout=self.max_timeout_s)
-                except concurrent.futures.TimeoutError:
-                    # Timed out
-                    profile_result.result = ProviderResult(ResultStatus.TIMEOUT)
-                finally:
-                    profile_result.finished_at = datetime.utcnow()
-                    yield profile_result
-        """
-
-        # TODO: Timeout on single threads
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_parallel_profile_runs) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(profile_ids)) as executor:
             futures = {executor.submit(self._run_one, profile_id): profile_id for profile_id in profile_ids}
             for future in concurrent.futures.as_completed(futures):
                 profile_id = futures[future]

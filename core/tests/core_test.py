@@ -34,13 +34,13 @@ class TestCore(unittest.TestCase):
 
         # Ping 1
         profile = Profile("Ping localhost", ping_provider_id)
-        profile.provider_parameters = {"Target": "127.0.0.1"}
+        profile.provider_parameters = {"Target": "127.0.0.1", "ThresholdMs": "22"}
         profile_runner.add(profile)
         ping1_id = profile.profile_id
 
         # Ping 2
         profile = Profile("Ping Google", ping_provider_id)
-        profile.provider_parameters = {"Target": "google.com"}
+        profile.provider_parameters = {"Target": "google.com", "ThresholdMs": "22"}
         profile_runner.add(profile)
         ping2_id = profile.profile_id
 

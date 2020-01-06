@@ -18,7 +18,7 @@ class ProvidersManager:
     """
 
     # Initialized once, at loading and then cached
-    _providers = {}     # Dict[str, BaseProvider]
+    _providers = {}     # Dict[str, str]
 
     def __init__(self) -> None:
         """

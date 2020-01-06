@@ -152,7 +152,7 @@ class BaseProvider(abc.ABC):
         params = self.discover_parameters()
         for key in filter(lambda p_key: params[p_key].required, params):
             # ... must be present
-            if key not in parameters:
+            if key not in parameters or parameters[key] is None or parameters[key] == "":
                 raise ValueError("'{name}' is required!".format(name=key))
 
         # ask the implementation to validate the parameters

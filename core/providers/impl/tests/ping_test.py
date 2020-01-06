@@ -9,7 +9,8 @@ class TestPingProvider(unittest.TestCase):
     def test_run_valid_params(self):
         # Arrange
         parameters = {
-            "Target": "127.0.0.1"
+            "Target": "127.0.0.1",
+            "ThresholdMs": "22"
         }
         provider = PingProvider()
 
@@ -17,6 +18,7 @@ class TestPingProvider(unittest.TestCase):
         provider_run = provider.run(parameters)
 
         # Assert
+        self.assertEqual(provider_run.status, ResultStatus.GREEN)
         self.assertIsInstance(provider_run.value, int)
 
     def test_run_invalid_params(self):
@@ -36,7 +38,8 @@ class TestPingProvider(unittest.TestCase):
     def test_validate_validparams(self):
         # Arrange
         parameters = {
-            "Target": "127.0.0.1"
+            "Target": "127.0.0.1",
+            "ThresholdMs": "22"
         }
         provider = PingProvider()
 
@@ -63,6 +66,6 @@ class TestPingProvider(unittest.TestCase):
         discovered_params = ping_provider.discover_parameters()
 
         # Assert
-        self.assertEqual(len(discovered_params), 2)
+        self.assertEqual(len(discovered_params), 3)
         self.assertTrue("Target" in discovered_params.keys())
         self.assertTrue("Common.SampleParameter" in discovered_params.keys())

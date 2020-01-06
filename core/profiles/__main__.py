@@ -13,7 +13,7 @@ When the script is executed.
 if __name__ == '__main__':
     # Resolve dependencies
     providers_manager = ProvidersManager()
-    profile_storage = FileProfileStorage()
+    profile_storage = FileProfileStorage("D:\\PythonProjects\\heartbeat\\heartbeat-pulse\\profiles.dat")
     profile_manager = ProfileManager(providers_manager, profile_storage)
 
     def main_menu():

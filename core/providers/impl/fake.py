@@ -17,10 +17,6 @@ class FakeProvider(BaseProvider):
         self.isRan = True
         return {"IsRan": True, "Parameters": parameters}
 
-    def _validate(self, parameters):
-        if (not parameters["FakeParam1"]):
-            raise ValueError("'FakeParam1' value is required!")
-
     def _discover_parameters(self) -> dict:
         return {
             "FakeParam1": ParameterMetadata(description="Fake required param", required=True),
