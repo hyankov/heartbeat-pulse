@@ -8,7 +8,7 @@ from core.profiles.base import Profile
 from core.profiles.management import ProfileManager
 from core.profiles.storage import InMemoryProfileStorage
 from core.providers.management import ProvidersManager
-from cron.running import ProfileRunner, ProfileRun
+from cron.running import ProfileRunner, ProfileResult
 
 
 class TestCore(unittest.TestCase):
@@ -54,7 +54,7 @@ class TestCore(unittest.TestCase):
 
         profile_runner = ProfileRunner(profile_runner, providers_manager)
 
-        results = []  # type: List[ProfileRun]
+        results = []  # type: List[ProfileResult]
         for x in range(10):
             results.extend(profile_runner.run_all())
 
@@ -65,8 +65,8 @@ class TestCore(unittest.TestCase):
         plt.xlabel('Date-Time')
         plt.ylabel('Ping (ms)')
 
-        plt.plot([o.provider_run.result for o in ping1_results])
-        plt.plot([o.provider_run.result for o in ping2_results])
+        plt.plot([o.result.value for o in ping1_results])
+        plt.plot([o.result.value for o in ping2_results])
         plt.show()
 
         self.assertTrue(True)

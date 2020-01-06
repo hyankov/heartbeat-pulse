@@ -12,9 +12,11 @@ When the script is executed.
 if __name__ == '__main__':
     # Resolve dependencies
     providers_manager = ProvidersManager()
-    profile_storage = FileProfileStorage()
-    profile_manager = ProfileManager(providers_manager, profile_storage)
-    profile_runner = ProfileRunner(profile_manager, providers_manager)
+    profile_runner = ProfileRunner(
+                        ProfileManager(
+                            providers_manager,
+                            FileProfileStorage()),
+                        providers_manager)
     results_handler = ConsoleResultHandler()
 
     # Run

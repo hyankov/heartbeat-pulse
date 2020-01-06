@@ -2,6 +2,7 @@ import unittest
 
 # Local application imports
 from core.providers.impl.ping import PingProvider
+from core.providers.base import ResultStatus
 
 
 class TestPingProvider(unittest.TestCase):
@@ -16,7 +17,7 @@ class TestPingProvider(unittest.TestCase):
         provider_run = provider.run(parameters)
 
         # Assert
-        self.assertIsInstance(provider_run.result, float)
+        self.assertIsInstance(provider_run.value, int)
 
     def test_run_invalid_params(self):
         # Arrange
@@ -25,9 +26,12 @@ class TestPingProvider(unittest.TestCase):
         }
         provider = PingProvider()
 
-        # Act & Assert
-        with self.assertRaises(ValueError):
-            provider.run(parameters)
+        # Act
+        result = provider.run(parameters)
+
+        # Assert
+        self.assertEqual(result.status, ResultStatus.ERROR)
+        self.assertIsNone(result.value)
 
     def test_validate_validparams(self):
         # Arrange

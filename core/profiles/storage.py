@@ -233,16 +233,14 @@ class FileProfileStorage(BaseProfileStorage):
         profiles = {}  # type: Dict[str, Profile]
 
         if path.exists(self._filename):
-            file = open(self._filename, 'rb')
-            profiles = pickle.load(file)
-            file.close()
+            with open(self._filename, 'rb') as file:
+                profiles = pickle.load(file)
 
         return profiles
 
     def _set_profiles(self, profiles: Dict[str, Profile]) -> None:
-        file = open(self._filename, 'wb')
-        pickle.dump(profiles, file)
-        file.close()
+        with open(self._filename, 'wb') as file:
+            pickle.dump(profiles, file)
 
     def get_all_ids(self) -> List[str]:
         """

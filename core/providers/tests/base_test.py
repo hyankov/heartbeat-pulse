@@ -22,7 +22,7 @@ class TestParameterMetadata(unittest.TestCase):
     def test_required(self):
         # Arrange
         descr = "description goes here"
-        parameter_metadata = ParameterMetadata(descr, False)
+        parameter_metadata = ParameterMetadata(description=descr)
 
         # Act & Assert
         self.assertEqual(parameter_metadata.description, descr)
@@ -30,9 +30,7 @@ class TestParameterMetadata(unittest.TestCase):
     def test_description(self):
         # Arrange
         required = True
-        parameter_metadata = ParameterMetadata(
-                                "description goes here",
-                                required)
+        parameter_metadata = ParameterMetadata(description="description goes here", required=required)
 
         # Act & Assert
         self.assertEqual(parameter_metadata.required, required)

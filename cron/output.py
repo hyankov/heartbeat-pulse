@@ -1,26 +1,43 @@
 # Standard library imports
 import abc
+from datetime import datetime
 
 # Local imports
-from core.providers.base import ProviderRun
+from core.providers.base import ProviderResult
 
 
-class ProfileRun:
+class ProfileResult:
     """
     Description
     --
-    The representation of a run of a profile.
+    Associates a profile with its result.
     """
 
-    def __init__(self, profile_id: str, profile_name: str, provider_run: ProviderRun) -> None:
+    def __init__(self, profile_id: str, started_at: datetime) -> None:
         """
-        - profile_id - the Id of the profile that ran.
-        - provider_run - the provider run.
+        Parameters
+        --
+        - profile_id - the Id of the profile that was executed.
+        - started_at - when was it started.
         """
 
+        if not profile_id:
+            raise ValueError("profile_id is required!")
+
+        if started_at is None:
+            raise ValueError("started_at is required!")
+
         self.profile_id = profile_id
-        self.profile_name = profile_name
-        self.provider_run = provider_run
+        self.result = None              # type: ProviderResult
+        self.started_at = started_at
+        self.finished_at = None         # type: datetime
+
+    @property
+    def runtime_ms(self) -> int:
+        if self.finished_at is None:
+            return None
+        else:
+            return int((self.finished_at - self.started_at).total_seconds() * 1000)
 
 
 class BaseResultHandler(abc.ABC):
@@ -31,7 +48,7 @@ class BaseResultHandler(abc.ABC):
     """
 
     @abc.abstractmethod
-    def handle_result(self, results: ProfileRun) -> None:
+    def handle_result(self, result: ProfileResult) -> None:
         """
         Description
         --
@@ -53,13 +70,18 @@ class ConsoleResultHandler(BaseResultHandler):
     A result handler that prints the results to the console.
     """
 
-    def handle_result(self, result: ProfileRun) -> None:
+    def handle_result(self, result: ProfileResult) -> None:
+        if result is None:
+            return
+
         print(
-            "[{}] Started: {}, Took: {}ms => {}".format(
-                result.profile_name,
-                result.provider_run.started_at,
-                result.provider_run.runtime_ms,
-                result.provider_run.result))
+            "[{}] [{}] Started: {}, Finished: {}, Took: {}ms => {}".format(
+                result.result.status.name,
+                result.profile_id,
+                result.started_at,
+                result.finished_at,
+                result.runtime_ms,
+                result.result.value))
 
 
 class RabbitMQResultHandler(BaseResultHandler):
@@ -69,6 +91,9 @@ class RabbitMQResultHandler(BaseResultHandler):
     A result handler that pushes the results into RabbitMQ.
     """
 
-    def handle_result(self, result: ProfileRun) -> None:
+    def handle_result(self, result: ProfileResult) -> None:
+        if result is None:
+            return
+
         # TODO: Implement
         raise NotImplementedError()

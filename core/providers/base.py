@@ -1,49 +1,50 @@
 # Import system
 import abc
-from typing import Any, Dict
-from datetime import datetime
+from typing import Any, Dict, NamedTuple
+from enum import Enum
 
 
-class ParameterMetadata:
+class ParameterMetadata(NamedTuple):
     """
     Description
     --
     Meta description of a provider parameter.
     """
 
-    def __init__(self, description: str, required: bool) -> None:
-        """
-        - description - the description of the parameter.
-        - required - true or false, whether the parameter is required.
-        """
-
-        self.description = description
-        self.required = required
+    description: str
+    required: bool = False
 
 
-class ProviderRun:
+class ResultStatus(Enum):
     """
-    A provider run.
+    Description
+    --
+    The status of a provider run result.
     """
 
-    def __init__(
-                self,
-                started_at: datetime,
-                finished_at: datetime,
-                result: Any) -> None:
+    GREEN = 'GREEN'
+    YELLOW = 'YELLOW'
+    RED = 'RED'
+    ERROR = 'ERROR'
+    TIMEOUT = 'TIMEOUT'
+
+
+class ProviderResult:
+    """
+    Description
+    --
+    The result of a  provider run.
+    """
+
+    def __init__(self, status: ResultStatus) -> None:
         """
-        - started_at - When was the run started.
-        - finished_at - When was the run finished.
-        - result - The result of th run.
+        Parameters
+        --
+        - status - the status of the result.
         """
 
-        self.started_at = started_at
-        self.finished_at = finished_at
-        self.result = result
-
-    @property
-    def runtime_ms(self) -> int:
-        return (self.finished_at - self.started_at).microseconds / 1000
+        self.status = status    # type: ResultStatus
+        self.value = None       # type: Any
 
 
 class BaseProvider(abc.ABC):
@@ -56,7 +57,56 @@ class BaseProvider(abc.ABC):
     - Common parameters for all providers.
     """
 
-    def run(self, parameters: Dict[str, str]) -> ProviderRun:
+    def _discover_parameters(self) -> Dict[str, ParameterMetadata]:
+        """
+        Description
+        --
+        Any parameters specifically required by the provider implementation.
+        Can be overriden.
+
+        Returns
+        --
+        The parameters, specific to the provider implementation, if any.
+        """
+
+        return {}  # type Dict[str, ParameterMetadata]
+
+    def _validate(self, parameters: Dict[str, str]) -> None:
+        """
+        Description
+        --
+        Additional validation to be performed by the provider implementation.
+        Can be overriden.
+
+        Parameters
+        --
+        - parameters - the parameters to pass to the provider instance to
+        validate.
+        """
+
+        pass
+
+    @abc.abstractmethod
+    def _run(self, parameters: Dict[str, str]) -> ProviderResult:
+        """
+        Description
+        --
+        The actual workload by the provider implementation.
+        Must be overriden.
+
+        Parameters
+        --
+        - parameters - the parameters to pass to the provider instance at
+        runtime.
+
+        Returns
+        --
+        The run result.
+        """
+
+        pass
+
+    def run(self, parameters: Dict[str, str]) -> ProviderResult:
         """
         Description
         --
@@ -70,19 +120,18 @@ class BaseProvider(abc.ABC):
 
         Returns
         --
-        A provider-specific format result.
+        The run result.
         """
 
-        # Validate parameters
-        self.validate(parameters)
+        try:
+            # Validate parameters
+            self.validate(parameters)
 
-        # Run the implementation work-load
-        started_at = datetime.utcnow()
-        result = self._run(parameters)
-        finished_at = datetime.utcnow()
-
-        # Return the provider run
-        return ProviderRun(started_at, finished_at, result)
+            # Run the implementation work-load and return the result
+            return self._run(parameters)
+        except Exception:
+            # TODO: Log
+            return ProviderResult(ResultStatus.ERROR)
 
     def validate(self, parameters: Dict[str, str]) -> None:
         """
@@ -123,59 +172,9 @@ class BaseProvider(abc.ABC):
 
         common_parameters = {
             # A sample of a common parameter for all providers
-            "Common.SampleParameter": ParameterMetadata(
-                                        "Example of a common parameter", False)
+            "Common.SampleParameter": ParameterMetadata(description="Example of a common parameter")
         }
 
         # merge with the provider-specific parameters & return
         common_parameters.update(self._discover_parameters())
         return common_parameters
-
-    def _discover_parameters(self) -> Dict[str, ParameterMetadata]:
-        """
-        Description
-        --
-        Any parameters specifically required by the provider implementation.
-        Can be overriden.
-
-        Returns
-        --
-        The parameters, specific to the provider implementation, if any.
-        """
-
-        return {}  # type Dict[str, ParameterMetadata]
-
-    def _validate(self, parameters: Dict[str, str]) -> None:
-        """
-        Description
-        --
-        Additional validation to be performed by the provider implementation.
-        Can be overriden.
-
-        Parameters
-        --
-        - parameters - the parameters to pass to the provider instance to
-        validate.
-        """
-
-        pass
-
-    @abc.abstractmethod
-    def _run(self, parameters: Dict[str, str]) -> None:
-        """
-        Description
-        --
-        The actual workload by the provider implementation.
-        Must be overriden.
-
-        Parameters
-        --
-        - parameters - the parameters to pass to the provider instance at
-        runtime.
-
-        Returns
-        --
-        The provider specific result.
-        """
-
-        pass

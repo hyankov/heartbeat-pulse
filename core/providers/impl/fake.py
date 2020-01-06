@@ -23,6 +23,6 @@ class FakeProvider(BaseProvider):
 
     def _discover_parameters(self) -> dict:
         return {
-            "FakeParam1": ParameterMetadata("Fake required param", True),
-            "FakeParam2": ParameterMetadata("Fake optional param", False)
+            "FakeParam1": ParameterMetadata(description="Fake required param", required=True),
+            "FakeParam2": ParameterMetadata(description="Fake optional param")
         }
