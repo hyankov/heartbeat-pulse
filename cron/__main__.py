@@ -3,20 +3,23 @@ from core.profiles.management import ProfileManager
 from core.profiles.storage import FileProfileStorage
 from core.providers.management import ProvidersManager
 from cron.output import ConsoleResultHandler
-from cron.running import CronRunner, ProfileRunner
+from cron.running import ProfileRunner
 
 
 """
 When the script is executed.
 """
 if __name__ == '__main__':
+    print("Wiring dependencies ...")
+    
     # Resolve dependencies
     providers_manager = ProvidersManager()
-    profile_runner = ProfileRunner(
-                        ProfileManager(
+    runner = ProfileRunner(
+                            ProfileManager(
+                                providers_manager,
+                                FileProfileStorage("D:\\PythonProjects\\heartbeat\\heartbeat-pulse\\profiles.dat")),
                             providers_manager,
-                            FileProfileStorage("D:\\PythonProjects\\heartbeat\\heartbeat-pulse\\profiles.dat")),
-                        providers_manager)
+                            ConsoleResultHandler())
+
     # Start
-    runner = CronRunner(profile_runner, ConsoleResultHandler())
     runner.start()

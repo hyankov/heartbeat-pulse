@@ -27,6 +27,8 @@ class PingProvider(BaseProvider):
 
     def _run(self, parameters: Dict[str, str]) -> ProviderResult:
         target = parameters[self._p_target]
+
+        # TODO: Resolution error should result in red
         ping_val = ping(target, unit=self._unit)
 
         if ping_val is None or ping_val is False:

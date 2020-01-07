@@ -53,7 +53,7 @@ if __name__ == '__main__':
             provider_parameters[param_key] = input("\t\t\tValue: ")
             print()
 
-        profile = Profile(name, provider_id)
+        profile = Profile(name, provider_id, "1")
         profile.provider_parameters = provider_parameters
         profile_manager.add(profile)
 
