@@ -22,7 +22,13 @@ def setup_menu():
     """
 
     def _run_config_ui(args):
-        ui = ConsoleUI()
+        # Resolve dependencies
+        providers_manager = ProvidersManager()
+        profile_manager = ProfileManager(
+                                providers_manager,
+                                FileProfileStorage(args.input_filename))
+
+        ui = ConsoleUI(profile_manager, providers_manager)
         ui.start(args.input_filename)
 
     def _run_config_template(args):

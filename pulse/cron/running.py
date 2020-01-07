@@ -1,7 +1,6 @@
 # System imports
 import concurrent.futures
 import time
-from typing import Generator, List
 import threading
 from datetime import datetime
 
@@ -70,7 +69,7 @@ class ProfileRunner:
         provider_instance = self._providers_manager.instantiate(profile.provider_id)
 
         # Run the provider, by passing the profile parameters
-        profile_result = ProfileResult(profile.profile_id, datetime.utcnow())
+        profile_result = ProfileResult(profile.profile_id, profile.name, datetime.utcnow())
         profile_result.result = provider_instance.run(profile.provider_parameters)
         profile_result.finished_at = datetime.utcnow()
 
@@ -88,13 +87,13 @@ class ProfileRunner:
             try:
                 profile_result = future.result(timeout=self.max_profile_run_timeout_s)
             except Exception as err:
-                profile_result = ProfileResult(profile.profile_id, now)
+                profile_result = ProfileResult(profile.profile_id, profile.name, now)
                 profile_result.finished_at = datetime.utcnow()
 
                 if isinstance(err, concurrent.futures._base.TimeoutError):
                     profile_result.result = ProviderResult(ResultStatus.TIMEOUT)
                 else:
-                    profile_result.result = ProviderResult(ResultStatus.ERROR)                
+                    profile_result.result = ProviderResult(ResultStatus.ERROR)
 
             # And handle the result
             if self._result_handler is not None:
@@ -114,8 +113,7 @@ class ProfileRunner:
         # Read the profiles and schedule the tasks
         for profile_id in self._profile_manager.get_all_ids():
             profile = self._profile_manager.get(profile_id)
-            # TODO: Use profile.schedule (cron tab to method translation)
-            schedule.every(int(profile.schedule)).seconds.do(run_threaded, profile)
+            schedule.every(profile.run_every_x_seconds).seconds.do(run_threaded, profile)
 
         print("Starting loop ...")
         while True:

@@ -1,22 +1,30 @@
-# System imports
-
 # Local imports
 from core.providers.management import ProvidersManager
-from core.profiles.storage import FileProfileStorage
 from core.profiles.management import ProfileManager
 from core.profiles.base import Profile
 
 
 class ConsoleUI:
+    def __init__(self, profile_manager: ProfileManager, providers_manager: ProvidersManager):
+        """
+        Parameters
+        --
+        - profile_manager - an inst
+        """
+
+        if profile_manager is None:
+            raise ValueError("profile_manager is required!")
+
+        if providers_manager is None:
+            raise ValueError("providers_manager is required!")
+
+        self.profile_manager = profile_manager
+        self.providers_manager = providers_manager
+
     def start(self, config_name) -> None:
         """
         When the script is executed.
         """
-
-        # Resolve dependencies
-        providers_manager = ProvidersManager()
-        profile_storage = FileProfileStorage(config_name)
-        profile_manager = ProfileManager(providers_manager, profile_storage)
 
         def main_menu():
             print("\n\nProfile management:")
@@ -28,7 +36,7 @@ class ConsoleUI:
         def list_menu():
             print("\n\nList:")
             i = 1
-            for id in profile_manager.get_all_ids():
+            for id in self.profile_manager.get_all_ids():
                 print("{i} {id}".format(i=i, id=id))
                 i += 1
 
@@ -38,16 +46,16 @@ class ConsoleUI:
             print("\n\nAdd profile:")
             print("\tChoose provider:")
             i = 1
-            for pid in providers_manager.get_all_ids():
+            for pid in self.providers_manager.get_all_ids():
                 print("\t\t{i}. {pid}".format(i=i, pid=pid))
                 i += 1
 
-            provider_id = providers_manager.get_all_ids()[int(input("> ")) - 1]
+            provider_id = self.providers_manager.get_all_ids()[int(input("> ")) - 1]
 
             name = input("\tProfile name:")
-            schedule = input("\tSchedule:")
+            schedule = int(input("\tSchedule:"))
             provider_parameters = {}
-            params = providers_manager.discover_parameters(provider_id)
+            params = self.providers_manager.discover_parameters(provider_id)
             for param_key in params:
                 param = params[param_key]
                 print("\t\t\tName: " + param_key)
@@ -58,7 +66,7 @@ class ConsoleUI:
 
             profile = Profile(name, provider_id, schedule)
             profile.provider_parameters = provider_parameters
-            profile_manager.add(profile)
+            self.profile_manager.add(profile)
 
         # Create the menu
         while True:

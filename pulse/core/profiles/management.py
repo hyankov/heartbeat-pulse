@@ -68,7 +68,7 @@ class ProfileManager:
         # Return the profile
         return profile
 
-    def add(self, profile: Profile) -> None:
+    def add(self, profile: Profile) -> str:
         """
         Description
         --

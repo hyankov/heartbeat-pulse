@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": ".venv\\Scripts\\python.exe",
+    "python.pythonPath": "D:\\PythonProjects\\heartbeat\\heartbeat-pulse\\.venv\\Scripts\\python.exe",
     "python.testing.unittestArgs": [
         "-m",
         "-v",
