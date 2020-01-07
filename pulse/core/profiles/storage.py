@@ -2,11 +2,11 @@
 import abc
 import pickle
 from typing import List, Dict
+from os import path
+import os
 
 # Local imports
 from core.profiles.base import Profile
-from os import path
-import os
 
 
 class BaseProfileStorage(abc.ABC):

@@ -30,7 +30,7 @@ class TestProfileManager(unittest.TestCase):
         # Arrange
         fake_providers_manager = MagicMock()
         fake_profile_storage = MagicMock()
-        profile = Profile("random-name", "random-provider-id")
+        profile = Profile("random-name", "random-provider-id", "1")
         fake_profile_storage.get.return_value = profile
         profile_manager = ProfileManager(
                             fake_providers_manager,
@@ -52,7 +52,7 @@ class TestProfileManager(unittest.TestCase):
         fake_providers_manager.instantiate.return_value = fake_provider_instance
 
         fake_profile_storage = MagicMock()
-        profile = Profile("random-name", provider_id)
+        profile = Profile("random-name", provider_id, "55")
         profile.provider_parameters = {"SomeParam": "value 1"}
         profile_manager = ProfileManager(
                             fake_providers_manager,
@@ -76,7 +76,7 @@ class TestProfileManager(unittest.TestCase):
         fake_providers_manager = MagicMock()
         fake_providers_manager.get_all_ids.return_value = ["SomeOtherProvider"]
 
-        profile = Profile("Some name", "SomeProvider")
+        profile = Profile("Some name", "SomeProvider", "1")
         profile.provider_parameters = {"SomeParam": "value 1"}
         fake_profile_storage = MagicMock()
         profile_manager = ProfileManager(
@@ -122,7 +122,7 @@ class TestProfileManager(unittest.TestCase):
 
     def test_update_exists_valid(self):
         # Arrange
-        old_profile = Profile("random-name", "random-provider-id")
+        old_profile = Profile("random-name", "random-provider-id", "1")
         old_profile.provider_parameters = {"SomeParam": "value 1"}
 
         fake_provider_instance = MagicMock()
@@ -138,7 +138,7 @@ class TestProfileManager(unittest.TestCase):
             fake_profile_storage)
 
         # Act
-        profile = Profile(old_profile.name, old_profile.provider_id)
+        profile = Profile(old_profile.name, old_profile.provider_id, "1")
         profile.provider_parameters = {"SomeParam": "value 2"}
         profile_manager.update(profile)
 
@@ -158,7 +158,7 @@ class TestProfile(unittest.TestCase):
         # Arrange
         name = "random_name"
         provider_id = "random_provider_id"
-        profile = Profile(name, provider_id)
+        profile = Profile(name, provider_id, "1")
 
         # Act & Assert
         self.assertEqual(profile.name, name)

@@ -115,8 +115,8 @@ class ProfileRunner:
         for profile_id in self._profile_manager.get_all_ids():
             profile = self._profile_manager.get(profile_id)
             # TODO: Use profile.schedule (cron tab to method translation)
-            schedule.every().second.do(run_threaded, profile)
-        
+            schedule.every(int(profile.schedule)).seconds.do(run_threaded, profile)
+
         print("Starting loop ...")
         while True:
             try:
