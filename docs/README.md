@@ -1,7 +1,7 @@
 hearbeat-pulse
 ========
 
-_(Documtation in progress)_
+_(Documentation in progress)_
 
 Health monitor.
 
