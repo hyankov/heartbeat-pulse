@@ -1,6 +1,6 @@
 - !!python/object:pulse.profiles.Profile
   name: Profile name goes here (1)
-  profile_id: 830243666b614a678827c786de518a05
+  profile_id: 423aeab270c94feab4c7f12374a19f1d
   provider_id: PingProvider
   provider_parameters:
     Common.SampleParameter: '[optional] Example of a common parameter'
@@ -9,7 +9,7 @@
   run_every_x_seconds: 10
 - !!python/object:pulse.profiles.Profile
   name: Profile name goes here (2)
-  profile_id: dab74ae1204a4279bd483ae03e877968
+  profile_id: a0b333d3353c4d8a8f7604f5524d0886
   provider_id: PingProvider
   provider_parameters:
     Common.SampleParameter: '[optional] Example of a common parameter'

@@ -2,7 +2,7 @@
 import argparse
 import yaml
 from typing import List
-
+from os import path
 
 # Local imports
 from .logging import get_module_logger
@@ -16,6 +16,9 @@ _logger = get_module_logger(__name__)
 
 
 def main():
+    default_input_config_file = "profiles_config.yaml"
+    default_output_config_file = "profiles_config-template.yaml"
+
     def _command_config_template(args):
         """
         The command that's executed for config template.
@@ -34,11 +37,17 @@ def main():
                 profile_template.provider_parameters[param_key] = "[{}] {}".format("required" if param.required else "optional", param.description)
             templates.append(profile_template)
 
+        filename = default_input_config_file
+
+        # if the default input exists, output the template under the template name
+        if path.exists(default_input_config_file):
+            filename = default_output_config_file
+
         # Dump the profiles in the template file
-        with open(args.output_filename, 'w') as file:
+        with open(filename, 'w') as file:
             file.write(yaml.dump(templates))
 
-        _logger.info("Config template written into file '{}'. Edit it to your liking and use it as an input for the 'start' command.".format(args.output_filename))
+        _logger.info("Config template written into file '{}'. Edit it to your liking and use it as an input for the 'start' command.".format(filename))
 
     def _command_start(args):
         """
@@ -55,9 +64,6 @@ def main():
         runner.start()
 
     def _setup_usage_args():
-        default_input_config_file = "config.yaml"
-        default_output_config_file = "config-template.yaml"
-
         parser = argparse.ArgumentParser(
             prog="pulse",
             description="Heartbeat monitor.",
