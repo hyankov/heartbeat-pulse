@@ -1,0 +1,8 @@
+- Graphical presentation of the output
+- Switch from print to logging
+- setup.py
+- additional providers
+- unit tests implementation, run coverage
+- package?
+- README.md & LICENSE.md
+- Common documentation format
