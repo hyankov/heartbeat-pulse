@@ -13,5 +13,8 @@
     "python.testing.unittestEnabled": true,
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": true
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+        "--ignore=E126,E501",
+    ]
 }

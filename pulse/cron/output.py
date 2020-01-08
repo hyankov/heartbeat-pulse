@@ -4,7 +4,7 @@ from datetime import datetime
 import logging
 
 # Local imports
-from core.providers.base import ProviderResult, ResultStatus
+from providers import ProviderResult
 
 
 class ProfileResult:
@@ -92,12 +92,7 @@ class ConsoleResultHandler(BaseResultHandler):
                 result.runtime_ms,
                 result.result.value)
 
-        if result.result.status == ResultStatus.GREEN:
-            self.log.info(msg)
-        elif result.result.status == ResultStatus.YELLOW:
-            self.log.warn(msg)
-        else:
-            self.log.error(msg)
+        print(msg)
 
 
 class RabbitMQResultHandler(BaseResultHandler):

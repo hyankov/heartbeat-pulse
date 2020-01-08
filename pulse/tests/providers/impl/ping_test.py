@@ -1,47 +1,47 @@
 import unittest
 
 # Local application imports
-from core.providers.impl.fake import FakeProvider
-from core.providers.base import ResultStatus
+from providers.impl.ping import PingProvider
+from providers import ResultStatus
 
 
-class TestFakeProvider(unittest.TestCase):
+class TestPingProvider(unittest.TestCase):
     def test_run_valid_params(self):
         # Arrange
         parameters = {
-            "FakeParam1": "value 1",
-            "FakeParam2": "value 2"
+            "Target": "127.0.0.1",
+            "ThresholdMs": "22"
         }
-        provider = FakeProvider()
+        provider = PingProvider()
 
         # Act
-        provider.run(parameters)
+        provider_run = provider.run(parameters)
 
         # Assert
-        self.assertTrue(provider.isRan)
+        self.assertEqual(provider_run.status, ResultStatus.GREEN)
+        self.assertIsInstance(provider_run.value, int)
 
     def test_run_invalid_params(self):
         # Arrange
         parameters = {
-            "FakeParam1": "",
-            "FakeParam2": "value 2"
+            "Target": ""
         }
-        provider = FakeProvider()
+        provider = PingProvider()
 
         # Act
         result = provider.run(parameters)
 
         # Assert
         self.assertEqual(result.status, ResultStatus.ERROR)
-        self.assertFalse(provider.isRan)
+        self.assertIsNone(result.value)
 
     def test_validate_validparams(self):
         # Arrange
         parameters = {
-            "FakeParam1": "value 1",
-            "FakeParam2": "value 2"
+            "Target": "127.0.0.1",
+            "ThresholdMs": "22"
         }
-        provider = FakeProvider()
+        provider = PingProvider()
 
         # Act
         provider.validate(parameters)
@@ -51,10 +51,8 @@ class TestFakeProvider(unittest.TestCase):
 
     def test_validate_invalidparams(self):
         # Arrange
-        parameters = {
-            "FakeParam2": "value 2"
-        }
-        provider = FakeProvider()
+        parameters = {}
+        provider = PingProvider()
 
         # Act & Assert
         with self.assertRaises(ValueError):
@@ -62,13 +60,12 @@ class TestFakeProvider(unittest.TestCase):
 
     def test_discover_parameters(self):
         # Arrange
-        provider = FakeProvider()
+        ping_provider = PingProvider()
 
         # Act
-        discovered_params = provider.discover_parameters()
+        discovered_params = ping_provider.discover_parameters()
 
         # Assert
         self.assertEqual(len(discovered_params), 3)
-        self.assertTrue("FakeParam1" in discovered_params.keys())
-        self.assertTrue("FakeParam2" in discovered_params.keys())
+        self.assertTrue("Target" in discovered_params.keys())
         self.assertTrue("Common.SampleParameter" in discovered_params.keys())

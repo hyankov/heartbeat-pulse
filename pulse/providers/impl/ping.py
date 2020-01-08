@@ -5,19 +5,14 @@ from typing import Dict
 from ping3 import ping
 
 # Local application imports
-from core.providers.base import BaseProvider, ParameterMetadata, ProviderResult, ResultStatus
+from providers import BaseProvider, ParameterMetadata, ProviderResult, ResultStatus
 
 
 class PingProvider(BaseProvider):
     """
     Description
     --
-    A Ping provider.
-    - Pings a hostname/IP address
-
-    TODO
-    --
-    - Hostname/IP validation
+    A Ping provider. Pings a hostname/IP address.
     """
 
     _unit = "ms"
@@ -28,11 +23,10 @@ class PingProvider(BaseProvider):
     def _run(self, parameters: Dict[str, str]) -> ProviderResult:
         target = parameters[self._p_target]
 
-        # TODO: Resolution error should result in red
         ping_val = ping(target, unit=self._unit)
 
-        if ping_val is None or ping_val is False:
-            # Bad
+        if ping_val is None or not ping_val:
+            # Resolution issue - bad
             return ProviderResult(ResultStatus.RED)
         else:
             limit = int(parameters[self._p_threshold_ms])
@@ -40,8 +34,10 @@ class PingProvider(BaseProvider):
             result.value = int(ping_val)
 
             if (result.value > limit):
+                # Over the limit
                 result.status = ResultStatus.RED
             elif (result.value > limit - (limit / 10)):
+                # Close to the limit (over 90%)
                 result.status = ResultStatus.YELLOW
 
             return result
@@ -54,15 +50,18 @@ class PingProvider(BaseProvider):
                 return False
             return True
 
+        # Threshold validation
         param = self._p_threshold_ms
         if not is_int(parameters[param]):
-            raise ValueError("Invalid integer for {}".format(param))
+            raise ValueError("Param '{}' is not an integer".format(param))
 
         if int(parameters[self._p_threshold_ms]) < 0:
-            raise ValueError("{} cannot be less than 0".format(param))
+            raise ValueError("Param '{}' cannot be less than 0".format(param))
 
-        # TODO: IP/hostname format validation
-        pass
+        # IP/hostname format validation
+        param = self._p_target
+        if " " in parameters[param]:
+            raise ValueError("Param '{}' contains spaces".format(param))
 
     def _discover_parameters(self) -> Dict[str, ParameterMetadata]:
         return {

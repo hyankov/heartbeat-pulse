@@ -3,10 +3,10 @@ import sys
 from typing import List, Dict
 
 # Local application imports
-from core.providers.base import BaseProvider, ParameterMetadata
+from providers import BaseProvider, ParameterMetadata
 
 # Load all provider implementation modules
-from core.providers.impl import *
+from providers.impl import *
 
 
 class ProvidersManager:
@@ -89,6 +89,9 @@ class ProvidersManager:
 
         if not provider_id:
             raise ValueError("provider_id is required!")
+
+        if self._providers[provider_id] is None:
+            raise ValueError("Provider with Id '{}' not found!".format(provider_id))
 
         # Use 'reflection' to create an instance
         provider_class_ = getattr(

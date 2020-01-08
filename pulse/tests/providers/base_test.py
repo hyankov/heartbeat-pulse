@@ -1,7 +1,7 @@
 import unittest
 
 # Local imports
-from core.providers.base import ParameterMetadata
+from providers import ParameterMetadata
 
 
 class TestBaseProvider(unittest.TestCase):
