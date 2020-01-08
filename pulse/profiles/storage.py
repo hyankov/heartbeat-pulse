@@ -6,7 +6,7 @@ import os
 import yaml
 
 # Local imports
-from profiles import Profile
+from . import Profile
 
 
 class BaseProfileStorage(abc.ABC):
@@ -123,7 +123,7 @@ class FileProfileStorage(BaseProfileStorage):
         if path.exists(self._file_path):
             if os.stat(self._file_path).st_size > 0:
                 with open(self._file_path, 'r') as file:
-                    profiles = list(yaml.load(file))
+                    profiles = list(yaml.load(file, Loader=yaml.FullLoader))
 
         return {profile.profile_id: profile for profile in profiles}
 

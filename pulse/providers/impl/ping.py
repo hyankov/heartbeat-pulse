@@ -5,7 +5,7 @@ from typing import Dict
 from ping3 import ping
 
 # Local application imports
-from providers import BaseProvider, ParameterMetadata, ProviderResult, ResultStatus
+from .. import BaseProvider, ParameterMetadata, ProviderResult, ResultStatus
 
 
 class PingProvider(BaseProvider):

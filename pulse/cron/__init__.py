@@ -8,11 +8,11 @@ from datetime import datetime
 import schedule
 
 # Local imports
-from profiles import Profile
-from profiles.storage import BaseProfileStorage
-from providers import ProviderResult, ResultStatus
-from providers.management import ProvidersManager
-from cron.output import BaseResultHandler, ProfileResult
+from ..logging import get_module_logger
+from ..profiles import Profile
+from ..profiles.storage import BaseProfileStorage
+from ..providers import ProviderResult, ResultStatus, ProvidersManager
+from .output import BaseResultHandler, ProfileResult
 
 
 class ProfileRunner:
@@ -46,6 +46,7 @@ class ProfileRunner:
         self._profile_storage = profile_storage
         self._providers_manager = providers_manager
         self._result_handler = result_handler
+        self._logger = get_module_logger(__name__)
 
     def _run_profile(self, profile: Profile) -> ProfileResult:
         """
@@ -109,7 +110,7 @@ class ProfileRunner:
         def run_threaded(profile: Profile) -> None:
             threading.Thread(target=self._run_and_handle, args=(profile,)).start()
 
-        print("Scheduling tasks ...")
+        self._logger.info("Scheduling tasks ...")
         # Read the profiles and schedule the tasks
         for profile_id in self._profile_storage.get_all_ids():
             profile = self._profile_storage.get(profile_id)
@@ -120,20 +121,27 @@ class ProfileRunner:
                 provider_instance = self._providers_manager.instantiate(profile.provider_id)
                 provider_instance.validate(profile.provider_parameters)
             except Exception as ex:
-                print("Error loading profile '{}': {}".format(profile.profile_id, ex))
+                self._logger.error("Error loading profile '{}': {}".format(profile.profile_id, ex))
             else:
                 schedule.every(profile.run_every_x_seconds).seconds.do(run_threaded, profile)
 
         if not schedule.jobs:
-            print("No valid profiles loaded, exiting!")
+            self._logger.warn("No valid profiles loaded, exiting!")
             return
+        else:
+            self._logger.info("{} profile(s) loaded.".format(len(schedule.jobs)))
 
-        print("Starting loop ...")
+        self._logger.info("Starting loop ...")
+
+        # run all jobs
+        schedule.run_all()
+        time.sleep(1)
+
         while True:
             try:
                 # Run the schedule
                 schedule.run_pending()
                 time.sleep(1)
             except KeyboardInterrupt:
-                print("Shutting down ...")
+                self._logger.info("Shutting down ...")
                 break

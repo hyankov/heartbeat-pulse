@@ -2,9 +2,10 @@
 import abc
 from datetime import datetime
 import logging
+from logging import Logger
 
 # Local imports
-from providers import ProviderResult
+from ..providers import ProviderResult, ResultStatus
 
 
 class ProfileResult:
@@ -69,16 +70,27 @@ class BaseResultHandler(abc.ABC):
         pass
 
 
-class ConsoleResultHandler(BaseResultHandler):
+class LoggerResultHandler(BaseResultHandler):
     """
     Description
     --
-    A result handler that prints the results to the console.
+    A result handler that prints the results to a log.
     """
 
     def __init__(self):
-        self.log = logging.getLogger()
-        self.log.addHandler(logging.StreamHandler())
+        self._logger = self._get_logger()
+
+    def _get_logger(self) -> Logger:
+        logger = logging.getLogger(__name__)
+
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.DEBUG)
+        logger.propagate = False
+
+        return logger
 
     def handle_result(self, result: ProfileResult) -> None:
         if result is None:
@@ -87,12 +99,17 @@ class ConsoleResultHandler(BaseResultHandler):
         msg = "[{}] [{}] Started: {}, Finished: {}, Took: {}ms => {}".format(
                 result.result.status.name,
                 result.profile_name,
-                result.started_at,
-                result.finished_at,
+                result.started_at.strftime('%c'),
+                result.finished_at.strftime('%c'),
                 result.runtime_ms,
                 result.result.value)
 
-        print(msg)
+        if result.result.status == ResultStatus.RED:
+            self._logger.error(msg)
+        elif result.result.status == ResultStatus.YELLOW:
+            self._logger.warn(msg)
+        else:
+            self._logger.info(msg)
 
 
 class RabbitMQResultHandler(BaseResultHandler):

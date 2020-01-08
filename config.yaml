@@ -1,14 +1,22 @@
-- !!python/object:profiles.Profile
-  name: ping localhost
-  profile_id: 1a3b7926114a4ee28943517199dd4093
-  provider_id: PingProviderxx
+- !!python/object:pulse.profiles.Profile
+  name: ping localhost 1
+  profile_id: 1
+  provider_id: PingProvider
   provider_parameters:
     Target: 'localhost'
     ThresholdMs: '2'
   run_every_x_seconds: 1
-- !!python/object:profiles.Profile
-  name: Ping Google
-  profile_id: 2a1fd6c6bc8543458ccb48fb3556785e
+- !!python/object:pulse.profiles.Profile
+  name: ping localhost 2
+  profile_id: 3
+  provider_id: PingProvider
+  provider_parameters:
+    Target: 'localhost'
+    ThresholdMs: '5'
+  run_every_x_seconds: 1
+- !!python/object:pulse.profiles.Profile
+  name: ping Google
+  profile_id: 2
   provider_id: PingProvider
   provider_parameters:
     Target: 'google.com'
