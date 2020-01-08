@@ -1,6 +1,8 @@
 hearbeat-pulse
 ========
 
+_(Documtation in progress)_
+
 Health monitor.
 
 Extensible health monitor. TODO ...
@@ -14,17 +16,18 @@ Features
 Setup
 -----
 
-.. code-block:: bash
+Generate config
 
-    $ py -m pulse gct
-
-.. code-block:: bash
-
-    $ py -m pulse start
+    $ pulse gct
 
 Configuration
 ----------
+TODO: ...
 
+Start
+-----
+
+    $ pulse start
 
 
 Extending
