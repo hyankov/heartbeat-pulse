@@ -7,9 +7,6 @@ import sys
 from enum import Enum
 from typing import Dict, List, NamedTuple
 
-# Local imports
-from ..logging import get_module_logger
-
 
 class ParameterMetadata(NamedTuple):
     """
@@ -65,9 +62,6 @@ class BaseProvider(abc.ABC):
     - Basic validation workflow.
     - Common parameters for all providers.
     """
-
-    def __init__(self):
-        self._logger = get_module_logger(__name__)
 
     def _discover_parameters(self) -> Dict[str, ParameterMetadata]:
         """
@@ -135,15 +129,11 @@ class BaseProvider(abc.ABC):
         The run result.
         """
 
-        try:
-            # Validate parameters
-            self.validate(parameters)
+        # Validate parameters
+        self.validate(parameters)
 
-            # Run the implementation work-load and return the result
-            return self._run(parameters)
-        except Exception as ex:
-            self._logger.error(ex)
-            return ProviderResult(ResultStatus.ERROR)
+        # Run the implementation work-load and return the result
+        return self._run(parameters)
 
     def validate(self, parameters: Dict[str, str]) -> None:
         """

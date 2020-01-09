@@ -99,6 +99,10 @@ class ProfileRunner:
                     profile_result.result = ProviderResult(ResultStatus.TIMEOUT)
                 else:
                     # The thread errored
+                    # Log it
+                    self._logger.error("Profile Id '{}' encountered error: {}".format(profile.profile_id, err))
+
+                    # Return generic error result
                     profile_result.result = ProviderResult(ResultStatus.ERROR)
             else:
                 # Did the normal profile result actually came back with a provider result?
@@ -137,7 +141,7 @@ class ProfileRunner:
                 schedule.every(profile.run_every_x_seconds).seconds.do(run_threaded, profile)
 
         if not schedule.jobs:
-            self._logger.warn("No valid profiles loaded, exiting!")
+            self._logger.critical("No valid profiles loaded, exiting!")
             return
         else:
             self._logger.info("{} profile(s) loaded.".format(len(schedule.jobs)))

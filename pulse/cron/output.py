@@ -6,6 +6,7 @@ from logging import Logger
 
 # Local imports
 from ..providers import ProviderResult, ResultStatus
+from ..config import Config
 
 
 class ProfileResult:
@@ -83,12 +84,13 @@ class LoggerResultHandler(BaseResultHandler):
     def _get_logger(self) -> Logger:
         logger = logging.getLogger(__name__)
 
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter('%(thread)d %(asctime)s %(name)-12s %(levelname)-8s %(message)s')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        logger.setLevel(logging.DEBUG)
-        logger.propagate = False
+        if not logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter(Config.load('output_logging', 'Format'))
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+            logger.setLevel(Config.load('output_logging', 'Level'))
+            logger.propagate = False
 
         return logger
 
@@ -96,13 +98,14 @@ class LoggerResultHandler(BaseResultHandler):
         if result is None:
             return
 
-        msg = "[{}] [{}] Started: {}, Finished: {}, Took: {}ms => {}".format(
-                result.result.status.name,
-                result.profile_name,
-                result.started_at.strftime('%c'),
-                result.finished_at.strftime('%c'),
-                result.runtime_ms,
-                result.result.value)
+        msg = Config.load('output_logging', 'Message').format(
+                status=result.result.status.name,
+                profile_name=result.profile_name,
+                profile_id=result.profile_id,
+                start_date=result.started_at,
+                end_date=result.finished_at,
+                runtime_ms=result.runtime_ms,
+                result_value=result.result.value)
 
         if result.result.status in [ResultStatus.ERROR, ResultStatus.TIMEOUT]:
             self._logger.error(msg)

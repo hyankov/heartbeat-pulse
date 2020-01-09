@@ -1,9 +1,7 @@
-- Fix logging (duplicate output)
-- Configuration json/YAML
+- README.md & LICENSE.md
 - Graphical presentation of the output
 - setup.py
 - additional providers
 - unit tests implementation, run coverage
 - package and distribution?
-- README.md & LICENSE.md
 - Common documentation format and generate docs?

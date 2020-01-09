@@ -12,12 +12,12 @@ from .providers import ProvidersManager
 from .cron import ProfileRunner
 from .cron.output import LoggerResultHandler
 
-_logger = get_module_logger(__name__)
-
 
 def main():
     default_input_config_file = "profiles_config.yaml"
     default_output_config_file = "profiles_config-template.yaml"
+
+    _logger = get_module_logger(__name__)
 
     def _command_config_template(args):
         """
