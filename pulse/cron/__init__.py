@@ -86,15 +86,26 @@ class ProfileRunner:
             now = datetime.utcnow()
 
             try:
+                # Normal profile result
                 profile_result = future.result(timeout=self.max_profile_run_timeout_s)
             except Exception as err:
+                # Profile result errored out
                 profile_result = ProfileResult(profile.profile_id, profile.name, now)
                 profile_result.finished_at = datetime.utcnow()
 
+                # What is the reason?
                 if isinstance(err, concurrent.futures._base.TimeoutError):
+                    # The thread timed out
                     profile_result.result = ProviderResult(ResultStatus.TIMEOUT)
                 else:
+                    # The thread errored
                     profile_result.result = ProviderResult(ResultStatus.ERROR)
+            else:
+                # Did the normal profile result actually came back with a provider result?
+                if profile_result.result is None:
+                    # Nothing was returned as a result from the provider, so create a dummy Unknown
+                    # provider result.
+                    profile_result.result = ProviderResult(ResultStatus.UNKNOWN)
 
             # And handle the result
             if self._result_handler is not None:
@@ -110,7 +121,7 @@ class ProfileRunner:
         def run_threaded(profile: Profile) -> None:
             threading.Thread(target=self._run_and_handle, args=(profile,)).start()
 
-        self._logger.info("Scheduling tasks ...")
+        self._logger.info("Loading profiles ...")
         # Read the profiles and schedule the tasks
         for profile_id in self._profile_storage.get_all_ids():
             profile = self._profile_storage.get(profile_id)

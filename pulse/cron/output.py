@@ -84,7 +84,7 @@ class LoggerResultHandler(BaseResultHandler):
         logger = logging.getLogger(__name__)
 
         handler = logging.StreamHandler()
-        formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+        formatter = logging.Formatter('%(thread)d %(asctime)s %(name)-12s %(levelname)-8s %(message)s')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         logger.setLevel(logging.DEBUG)
@@ -104,9 +104,9 @@ class LoggerResultHandler(BaseResultHandler):
                 result.runtime_ms,
                 result.result.value)
 
-        if result.result.status == ResultStatus.RED:
+        if result.result.status in [ResultStatus.ERROR, ResultStatus.TIMEOUT]:
             self._logger.error(msg)
-        elif result.result.status == ResultStatus.YELLOW:
+        elif result.result.status in [ResultStatus.RED, ResultStatus.YELLOW]:
             self._logger.warn(msg)
         else:
             self._logger.info(msg)

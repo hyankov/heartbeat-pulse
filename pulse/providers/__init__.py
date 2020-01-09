@@ -5,7 +5,10 @@ import os
 import pkgutil
 import sys
 from enum import Enum
-from typing import Any, Dict, List, NamedTuple
+from typing import Dict, List, NamedTuple
+
+# Local imports
+from ..logging import get_module_logger
 
 
 class ParameterMetadata(NamedTuple):
@@ -31,6 +34,7 @@ class ResultStatus(Enum):
     RED = 'RED'
     ERROR = 'ERROR'
     TIMEOUT = 'TIMEOUT'
+    UNKNOWN = 'UNKNOWN'
 
 
 class ProviderResult:
@@ -40,15 +44,16 @@ class ProviderResult:
     The result of a  provider run.
     """
 
-    def __init__(self, status: ResultStatus) -> None:
+    def __init__(self, status: ResultStatus, value: int = None) -> None:
         """
         Parameters
         --
         - status - the status of the result.
+        - value - the value of the result.
         """
 
-        self.status = status    # type: ResultStatus
-        self.value = None       # type: Any
+        self.status = status                            # type: ResultStatus
+        self.value = value if value is not None else 0  # type: int
 
 
 class BaseProvider(abc.ABC):
@@ -60,6 +65,9 @@ class BaseProvider(abc.ABC):
     - Basic validation workflow.
     - Common parameters for all providers.
     """
+
+    def __init__(self):
+        self._logger = get_module_logger(__name__)
 
     def _discover_parameters(self) -> Dict[str, ParameterMetadata]:
         """
@@ -133,8 +141,8 @@ class BaseProvider(abc.ABC):
 
             # Run the implementation work-load and return the result
             return self._run(parameters)
-        except Exception:
-            # TODO: Log
+        except Exception as ex:
+            self._logger.error(ex)
             return ProviderResult(ResultStatus.ERROR)
 
     def validate(self, parameters: Dict[str, str]) -> None:

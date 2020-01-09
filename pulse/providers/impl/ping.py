@@ -22,7 +22,6 @@ class PingProvider(BaseProvider):
 
     def _run(self, parameters: Dict[str, str]) -> ProviderResult:
         target = parameters[self._p_target]
-
         ping_val = ping(target, unit=self._unit)
 
         if ping_val is None or not ping_val:
@@ -30,8 +29,7 @@ class PingProvider(BaseProvider):
             return ProviderResult(ResultStatus.RED)
         else:
             limit = int(parameters[self._p_threshold_ms])
-            result = ProviderResult(ResultStatus.GREEN)
-            result.value = int(ping_val)
+            result = ProviderResult(ResultStatus.GREEN, int(ping_val))
 
             if (result.value > limit):
                 # Over the limit

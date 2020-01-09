@@ -1,3 +1,5 @@
+- Fix logging (duplicate output)
+- Configuration json/YAML
 - Graphical presentation of the output
 - setup.py
 - additional providers
