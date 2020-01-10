@@ -29,9 +29,8 @@ class ResultStatus(Enum):
     GREEN = 'GREEN'
     YELLOW = 'YELLOW'
     RED = 'RED'
-    ERROR = 'ERROR'
     TIMEOUT = 'TIMEOUT'
-    UNKNOWN = 'UNKNOWN'
+    ERROR = 'ERROR'
 
 
 class ProviderResult:
@@ -93,7 +92,7 @@ class BaseProvider(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _run(self, parameters: Dict[str, str]) -> ProviderResult:
+    def run(self, parameters: Dict[str, str]) -> ProviderResult:
         """
         Description
         --
@@ -111,29 +110,6 @@ class BaseProvider(abc.ABC):
         """
 
         pass
-
-    def run(self, parameters: Dict[str, str]) -> ProviderResult:
-        """
-        Description
-        --
-        Executes the provider, with the passed parameters,
-        after their validation.
-
-        Parameters
-        --
-        - parameters - the parameters to pass to the provider instance at
-        runtime.
-
-        Returns
-        --
-        The run result.
-        """
-
-        # Validate parameters
-        self.validate(parameters)
-
-        # Run the implementation work-load and return the result
-        return self._run(parameters)
 
     def validate(self, parameters: Dict[str, str]) -> None:
         """
@@ -155,7 +131,7 @@ class BaseProvider(abc.ABC):
         for key in filter(lambda p_key: params[p_key].required, params):
             # ... must be present
             if key not in parameters or not parameters[key]:
-                raise ValueError("Param '{}' is required!".format(key))
+                raise ValueError("Param '%s' is required!", key)
 
         # ask the implementation to validate the parameters
         self._validate(parameters)
@@ -269,7 +245,7 @@ class ProvidersManager:
             raise ValueError("provider_id is required!")
 
         if self._providers[provider_id] is None:
-            raise ValueError("Provider with Id '{}' not found!".format(provider_id))
+            raise ValueError("Provider with Id '%s' not found!", provider_id)
 
         # Use 'reflection' to create an instance
         provider_class_ = getattr(

@@ -47,7 +47,9 @@ def main():
         with open(filename, 'w') as file:
             file.write(yaml.dump(templates))
 
-        _logger.info("Config template written into file '{}'. Edit it to your liking and use it as an input for the 'start' command.".format(filename))
+        _logger.info(
+            "Config template written into file '%s'. Edit it to your liking and use it as an input for the 'start' command.",
+            filename)
 
     def _command_start(args):
         """

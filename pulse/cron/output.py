@@ -5,6 +5,7 @@ from logging.config import fileConfig
 from os import path
 
 # Local imports
+from ..profiles import Profile
 from ..providers import ProviderResult, ResultStatus
 
 
@@ -15,26 +16,21 @@ class ProfileResult:
     Associates a profile with its result.
     """
 
-    def __init__(self, profile_id: str, profile_name: str, started_at: datetime) -> None:
+    def __init__(self, profile: Profile, started_at: datetime) -> None:
         """
         Parameters
         --
-        - profile_id - the Id of the profile that was executed.
-        - profile_name - the name of the profile that was executed.
+        - profile - the profile that was executed.
         - started_at - when was it started.
         """
 
-        if not profile_id:
-            raise ValueError("profile_id is required!")
-
-        if not profile_name:
-            raise ValueError("profile_name is required!")
+        if profile is None:
+            raise ValueError("profile is required!")
 
         if started_at is None:
             raise ValueError("started_at is required!")
 
-        self.profile_id = profile_id
-        self.profile_name = profile_name
+        self.profile = profile
         self.result = None              # type: ProviderResult
         self.started_at = started_at
         self.finished_at = None         # type: datetime
@@ -55,7 +51,7 @@ class LogResultHandler():
     """
 
     def __init__(self) -> None:
-        log_file_path = path.join(path.dirname(path.abspath(__file__)), '../../config/output.config.ini')
+        log_file_path = path.join(path.dirname(path.abspath(__file__)), '../../config/output.ini')
         fileConfig(log_file_path)
         self._logger = logging.getLogger('pulseoutput')
 
@@ -63,19 +59,23 @@ class LogResultHandler():
         if result is None:
             return
 
+        # TODO: Dynamic dictionary?
         msg = {
                 'status': result.result.status.name,
-                'profile_name': result.profile_name,
-                'profile_id': result.profile_id,
+                'profile_name': result.profile.name,
+                'profile_id': result.profile.id,
                 'start_date': result.started_at,
                 'end_date': result.finished_at,
                 'runtime_ms': result.runtime_ms,
                 'result_value': result.result.value
         }
 
-        if result.result.status == ResultStatus.TIMEOUT:
+        # RED and TIMEOUT-s are Error
+        if result.result.status in [ResultStatus.RED, ResultStatus.TIMEOUT]:
             self._logger.error('', extra=msg)
-        elif result.result.status in [ResultStatus.RED, ResultStatus.YELLOW]:
+        # YELLOW is Warning
+        elif result.result.status == ResultStatus.YELLOW:
             self._logger.warn('', extra=msg)
+        # GREEN is Info
         else:
             self._logger.info('', extra=msg)

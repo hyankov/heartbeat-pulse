@@ -125,7 +125,7 @@ class FileProfileStorage(BaseProfileStorage):
                 with open(self._file_path, 'r') as file:
                     profiles = list(yaml.load(file, Loader=yaml.FullLoader))
 
-        return {profile.profile_id: profile for profile in profiles}
+        return {profile.id: profile for profile in profiles}
 
     def get_all_ids(self) -> List[str]:
         """

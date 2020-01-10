@@ -20,7 +20,7 @@ class Profile:
         """
 
         # Auto-generate the profile Id
-        self.profile_id = uuid.uuid4().hex
+        self.id = uuid.uuid4().hex
 
         # Set the initializer parameters as properties
         self.name = name
@@ -51,5 +51,5 @@ class Profile:
         if self.run_every_x_seconds <= 0:
             raise ValueError("run_every_x_seconds must be > 0")
 
-        if not self.profile_id:
-            raise ValueError("profile_id is required")
+        if not self.id:
+            raise ValueError("id is required")

@@ -12,17 +12,7 @@ class SampleProvider(BaseProvider):
     A sample provider.
     """
 
-    _p_sample_param = "SampleParam"
-
-    def _run(self, parameters: Dict[str, str]) -> ProviderResult:
-        # get the expected parameter
-        param_value = parameters[self._p_sample_param]
-
-        # TODO: Perform logic
-        result = ProviderResult(ResultStatus.GREEN, 0)
-
-        raise NotImplementedError()
-        # return result
+    _p_sample_param = "SampleParam"    
 
     def _validate(self, parameters: Dict[str, str]) -> None:
         # Additional parameter validation
@@ -35,3 +25,13 @@ class SampleProvider(BaseProvider):
         return {
             self._p_sample_param: ParameterMetadata(description="Sample param description", required=True)
         }
+
+    def run(self, parameters: Dict[str, str]) -> ProviderResult:
+        # get the expected parameter
+        param_value = parameters[self._p_sample_param]
+
+        # TODO: Perform logic
+        result = ProviderResult(ResultStatus.GREEN, 0)
+
+        raise NotImplementedError()
+        # return result

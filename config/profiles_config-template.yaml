@@ -1,6 +1,6 @@
 - !!python/object:pulse.profiles.Profile
+  id: 1fe3fea5f3bc41efa8dd8c9cf0ab2f2b
   name: Profile name goes here (1)
-  profile_id: 42c493d0f2634c4db85d482873bade8c
   provider_id: PingProvider
   provider_parameters:
     Common.SampleParameter: '[optional] Example of a common parameter'
@@ -8,16 +8,16 @@
     ThresholdMs: '[required] Threshold (ms)'
   run_every_x_seconds: 10
 - !!python/object:pulse.profiles.Profile
+  id: 9b6dfb1b53c640cdb94b5fddf28a61b7
   name: Profile name goes here (2)
-  profile_id: 71175fd8fddd40cdb9744a7295bb1494
   provider_id: SampleProvider
   provider_parameters:
     Common.SampleParameter: '[optional] Example of a common parameter'
     SampleParam: '[required] Sample param description'
   run_every_x_seconds: 10
 - !!python/object:pulse.profiles.Profile
+  id: de02f88fb45b4703a1ea321692ba3f6e
   name: Profile name goes here (3)
-  profile_id: af9ec3c36fa748eeac75adf425242d8f
   provider_id: PingProvider
   provider_parameters:
     Common.SampleParameter: '[optional] Example of a common parameter'
@@ -25,8 +25,8 @@
     ThresholdMs: '[required] Threshold (ms)'
   run_every_x_seconds: 10
 - !!python/object:pulse.profiles.Profile
+  id: c4a603e2557c4f4092c330512db140ba
   name: Profile name goes here (4)
-  profile_id: c266a2197a5c475eb33d49284f1ca5e5
   provider_id: SampleProvider
   provider_parameters:
     Common.SampleParameter: '[optional] Example of a common parameter'
