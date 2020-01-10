@@ -1,0 +1,8 @@
+- !!python/object:pulse.profiles.Profile
+  name: ping localhost 1
+  profile_id: 1
+  provider_id: PingProvider
+  provider_parameters:
+    Target: 'localhost'
+    ThresholdMs: '2'
+  run_every_x_seconds: 1

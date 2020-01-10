@@ -10,12 +10,12 @@ from .profiles import Profile
 from .profiles.storage import FileProfileStorage
 from .providers import ProvidersManager
 from .cron import ProfileRunner
-from .cron.output import LoggerResultHandler
+from .cron.output import LogResultHandler
 
 
 def main():
-    default_input_config_file = "profiles_config.yaml"
-    default_output_config_file = "profiles_config-template.yaml"
+    default_input_config_file = "config/profiles_config.yaml"
+    default_output_config_file = "config/profiles_config-template.yaml"
 
     _logger = get_module_logger(__name__)
 
@@ -58,7 +58,7 @@ def main():
         runner = ProfileRunner(
             FileProfileStorage(args.input_filename),
             ProvidersManager(),
-            LoggerResultHandler())
+            LogResultHandler())
 
         # Start
         runner.start()

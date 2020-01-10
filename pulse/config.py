@@ -6,7 +6,7 @@ import configparser
 class Config:
     @staticmethod
     def load(section_name, key_name):
-        _filename = "config.ini"
+        _filename = "config/app.config.ini"
 
         if not section_name:
             raise ValueError("section_name is required")

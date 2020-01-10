@@ -1,4 +1,6 @@
 - README.md & LICENSE.md
+- multiple output handlers
+- configurable output handlers
 - Graphical presentation of the output
 - setup.py
 - additional providers

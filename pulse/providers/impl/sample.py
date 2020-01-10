@@ -21,8 +21,8 @@ class SampleProvider(BaseProvider):
         # TODO: Perform logic
         result = ProviderResult(ResultStatus.GREEN, 0)
 
-        # and return result
-        return result
+        raise NotImplementedError()
+        # return result
 
     def _validate(self, parameters: Dict[str, str]) -> None:
         # Additional parameter validation

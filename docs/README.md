@@ -3,15 +3,19 @@ hearbeat-pulse
 
 _(Documentation in progress)_
 
-Health monitor.
-
-Extensible health monitor. TODO ...
+Extensible system health-check framework, in Python.
 
 Features
 --------
-- feat 1
-- feat 2
-- feat 3
+- Number of pre-baked health-check providers (e.g. Ping, HTTP Get)
+- A few pre-baked result handlers to visualize the output of the checks (e.g. Logging and InstantGraph)
+- Human-readable profile configuration
+- Ability to easily implement new health-check providers
+- Ability to easily implement new and additional result handlers 
+
+Overview
+--------
+...
 
 Setup
 -----

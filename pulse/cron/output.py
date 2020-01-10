@@ -1,12 +1,11 @@
 # Standard library imports
-import abc
 from datetime import datetime
 import logging
-from logging import Logger
+from logging.config import fileConfig
+from os import path
 
 # Local imports
 from ..providers import ProviderResult, ResultStatus
-from ..config import Config
 
 
 class ProfileResult:
@@ -48,83 +47,35 @@ class ProfileResult:
             return int((self.finished_at - self.started_at).total_seconds() * 1000)
 
 
-class BaseResultHandler(abc.ABC):
-    """
-    Description
-    --
-    The base abstract results handler class.
-    """
-
-    @abc.abstractmethod
-    def handle_result(self, result: ProfileResult) -> None:
-        """
-        Description
-        --
-        Handles the result.
-        Must be overriden.
-
-        Parameters
-        --
-        - result - the run result.
-        """
-
-        pass
-
-
-class LoggerResultHandler(BaseResultHandler):
+class LogResultHandler():
     """
     Description
     --
     A result handler that prints the results to a log.
     """
 
-    def __init__(self):
-        self._logger = self._get_logger()
-
-    def _get_logger(self) -> Logger:
-        logger = logging.getLogger(__name__)
-
-        if not logger.handlers:
-            handler = logging.StreamHandler()
-            formatter = logging.Formatter(Config.load('output_logging', 'Format'))
-            handler.setFormatter(formatter)
-            logger.addHandler(handler)
-            logger.setLevel(Config.load('output_logging', 'Level'))
-            logger.propagate = False
-
-        return logger
+    def __init__(self) -> None:
+        log_file_path = path.join(path.dirname(path.abspath(__file__)), '../../config/output.config.ini')
+        fileConfig(log_file_path)
+        self._logger = logging.getLogger('pulseoutput')
 
     def handle_result(self, result: ProfileResult) -> None:
         if result is None:
             return
 
-        msg = Config.load('output_logging', 'Message').format(
-                status=result.result.status.name,
-                profile_name=result.profile_name,
-                profile_id=result.profile_id,
-                start_date=result.started_at,
-                end_date=result.finished_at,
-                runtime_ms=result.runtime_ms,
-                result_value=result.result.value)
+        msg = {
+                'status': result.result.status.name,
+                'profile_name': result.profile_name,
+                'profile_id': result.profile_id,
+                'start_date': result.started_at,
+                'end_date': result.finished_at,
+                'runtime_ms': result.runtime_ms,
+                'result_value': result.result.value
+        }
 
-        if result.result.status in [ResultStatus.ERROR, ResultStatus.TIMEOUT]:
-            self._logger.error(msg)
+        if result.result.status == ResultStatus.TIMEOUT:
+            self._logger.error('', extra=msg)
         elif result.result.status in [ResultStatus.RED, ResultStatus.YELLOW]:
-            self._logger.warn(msg)
+            self._logger.warn('', extra=msg)
         else:
-            self._logger.info(msg)
-
-
-class RabbitMQResultHandler(BaseResultHandler):
-    """
-    Description
-    --
-    A result handler that pushes the results into RabbitMQ.
-    """
-
-    def handle_result(self, result: ProfileResult) -> None:
-        if result is None:
-            return
-
-        # TODO: Implement
-        raise NotImplementedError()
+            self._logger.info('', extra=msg)

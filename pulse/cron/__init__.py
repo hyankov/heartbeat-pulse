@@ -12,7 +12,7 @@ from ..logging import get_module_logger
 from ..profiles import Profile
 from ..profiles.storage import BaseProfileStorage
 from ..providers import ProviderResult, ResultStatus, ProvidersManager
-from .output import BaseResultHandler, ProfileResult
+from .output import LogResultHandler, ProfileResult
 
 
 class ProfileRunner:
@@ -28,7 +28,7 @@ class ProfileRunner:
                 self,
                 profile_storage: BaseProfileStorage,
                 providers_manager: ProvidersManager,
-                result_handler: BaseResultHandler) -> None:
+                result_handler: LogResultHandler) -> None:
         """
         Parameters
         --
@@ -111,8 +111,8 @@ class ProfileRunner:
                     # provider result.
                     profile_result.result = ProviderResult(ResultStatus.UNKNOWN)
 
-            # And handle the result
-            if self._result_handler is not None:
+            # Only allow GREEN, YELLOW, RED and TIMEOUT results to go to the results handler
+            if self._result_handler is not None and profile_result.result.status not in [ResultStatus.ERROR, ResultStatus.UNKNOWN]:
                 self._result_handler.handle_result(profile_result)
 
     def start(self) -> None:
